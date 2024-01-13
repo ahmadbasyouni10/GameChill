@@ -1,0 +1,12 @@
+//Specifies root files and compiler options for TypeScript project
+{
+    "compilerOptions": {
+        "target": "es6", //version of JS
+        "module": "commonjs", 
+        "rootDir": "src", //code in src dir
+        "outDir": "dist",
+        "strict": true,
+        "esModuleInterop": true},
+    "include": ["src/**/*.ts"], //include all TS files in src
+    "exclude": ["node_modules"] //exclide all TS files in node_modules
+}
