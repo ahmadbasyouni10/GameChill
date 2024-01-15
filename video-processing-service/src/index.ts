@@ -38,7 +38,7 @@ app.post("/process-video", (req, res) => {
         .save(outputPath);
 });
 
-//When deployed we will use PORT provided, if not then 3000 (default)
+//When deployed we will use PORT provided, if not then 3000
 const port = process.env.PORT || 3000;
 app.listen(port, ()=> {
     console.log(
