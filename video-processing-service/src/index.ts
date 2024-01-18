@@ -1,42 +1,62 @@
 import express from "express";
 import ffmpeg from 'fluent-ffmpeg'; //fmpeg library to be used in TS code
+import { deleteProcessedVideo, deleteUnprocessedVideo, downloadUnprocessedVideo, processVideo, setUpDirectories, uploadProcessedVideo } from "./gcs-storage";
 
-//creating instance of express and m
+//Ensures local directories for unprocessed and processed videos exist
+setUpDirectories()
+
+
+//creating instance of express
 const app = express()
 //middleware for server to deal with JSON when post request
 app.use(express.json())
 
-//HTTP post method process videos locally 
-app.post("/process-video", (req, res) => {
-    //request will have the video path we want to process
-    const inputPath = req.body.inputPath;
-    const outputPath = req.body.outputPath;
 
-    //Error handling if inputpath or output path not defined
-    if (!inputPath) {
-        res.status(400).send("Bad Request. Missing Input File Path")
+//Async anynomous function
+app.post("/process-video", async (req, res) => {
+    //FileName to be processed locally and sent back to GCS from Cloud PUB/SUB message
+    //message received everytime bucket unprocessed receives a video
+    let data;
+    try {
+        const message = Buffer.from(req.body.message.data, 'base64').toString('utf8')
+        data = JSON.parse(message)
+
+        if (!data.name) {
+            throw new Error("Invalid message received") 
+        }
+    }
+    catch(error) {
+    console.error(error)
+    return res.status(400).send("Bad Request: Missing name of file")
+    }
+    
+    const inputFileName = data.name
+    const outputFileName = `processed-${inputFileName}`
+
+    await downloadUnprocessedVideo(inputFileName)
+
+    try {
+        await processVideo(inputFileName, outputFileName)
+    } catch (err) {
+        //delete videos locally unprocessed. Also, processed incase file was made before error
+        await Promise.all([
+            deleteUnprocessedVideo(inputFileName),
+            deleteProcessedVideo(outputFileName)])
+        console.log(err)
+        return res.status(500).send("Internal Server Error, Video processing Failed");
     }
 
-    else if (!outputPath) {
-        res.status(400).send("Bad Request. Missing Output File")
-    }
+    await uploadProcessedVideo(outputFileName);
 
-    //Convert Video using ffmpeg, provide options of resolution
-    ffmpeg(inputPath)
-        .outputOptions('-vf', 'scale=1280:720') //720P
-        //anynomous function when processing is finished (success status code)
-        .on("end", ()=>{
-            res.status(200).send("Video Processing Successful.")
-        })
-        
-        //Error handling (Internal Server error code)
-        .on("error", (err) => {
-            console.log(`An error has occured: ${err.message}`);
-            res.status(500).send(`Internal Server Error: ${err.message}`);
-        })
-        //save the processed video
-        .save(outputPath);
-});
+    await Promise.all([
+        deleteUnprocessedVideo(inputFileName),
+        deleteProcessedVideo(outputFileName)
+    ])
+
+    return res.status(200).send("Processing finished successfuly")
+
+})
+
 
 //When deployed we will use PORT provided, if not then 3000
 const port = process.env.PORT || 3000;
@@ -44,4 +64,3 @@ app.listen(port, ()=> {
     console.log(
         `Video processing service listening at http://localhost:${port}`);
 });
-
