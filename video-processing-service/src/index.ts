@@ -1,5 +1,4 @@
 import express from "express";
-import ffmpeg from 'fluent-ffmpeg'; //fmpeg library to be used in TS code
 import { deleteProcessedVideo, deleteUnprocessedVideo, downloadUnprocessedVideo, processVideo, setUpDirectories, uploadProcessedVideo } from "./gcs-storage";
 
 //Ensures local directories for unprocessed and processed videos exist
@@ -12,7 +11,7 @@ const app = express()
 app.use(express.json())
 
 
-//Async anynomous function
+//Async anynomous function to process a video from GCS to 720p
 app.post("/process-video", async (req, res) => {
     //FileName to be processed locally and sent back to GCS from Cloud PUB/SUB message
     //message received everytime bucket unprocessed receives a video
