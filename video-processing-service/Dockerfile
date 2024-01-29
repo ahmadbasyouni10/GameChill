@@ -26,7 +26,7 @@ FROM node:18.19.0
 # Install ffmpeg in the container
 RUN apt-get update && apt-get install -y ffmpeg
 
-WORKDIR /app
+WORKDIR /app4
 
 COPY package*.json ./
 

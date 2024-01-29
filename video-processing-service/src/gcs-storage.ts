@@ -1,6 +1,6 @@
-import { Storage } from '@google-cloud/storage';
-import fs from 'fs'
-import ffmpeg from 'fluent-ffmpeg';
+import { Storage } from '@google-cloud/storage'; //GCS
+import fs from 'fs' //File System Library
+import ffmpeg from 'fluent-ffmpeg'; //fmpeg library to be used in TS code
 
 //Creates instance of GCS storage library
 const storage = new Storage();
@@ -12,13 +12,14 @@ const processedBucketName = "gamechill-processed";
 
 //Where unprocessed and processed videos will go locally
 //Need to clean these after processing a video
-const localUnprocessedPath = " ./unprocessed-videos";
-const localProcessedPath = " ./processed-videos";
+const localUnprocessedPath = "./unprocessed-videos";
+const localProcessedPath = "./processed-videos";
 
 
-//Creates the local directories for unprocessed and processed videos 
+//Creates the local directories for unprocessed and processed videos in docker container locally
 export function setUpDirectories() {
-    
+    ensureDirectoryExistence(localUnprocessedPath)
+    ensureDirectoryExistence(localProcessedPath)
 }
 
 
@@ -127,4 +128,17 @@ export function deleteUnprocessedVideo(fileName: string) {
 
 export function deleteProcessedVideo (fileName: string) {
     return deleteFile(`${localProcessedPath}/${fileName}`)
+}
+
+
+/**
+ * 
+ * @param {string} dirPath - this is directory path to check
+ */
+//Function that is called to ensure local directories exist for unprocessed and processed videos
+function ensureDirectoryExistence(dirPath: string) {
+    if (!fs.existsSync(dirPath)) {
+        fs.mkdirSync(dirPath, {recursive: true});
+        console.log(`Directory created at ${dirPath}`)
+    }
 }
