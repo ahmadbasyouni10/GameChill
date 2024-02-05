@@ -1,0 +1,4 @@
+-Next JS handles server side rendering and takes care of routing through the naming of the folders.
+-HTML inside React Components are written with JSX (.tsx files)
+-classes are className
+-css is done using styles.xxxxxx
