@@ -1,0 +1,21 @@
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1em;
+}
+
+.logoContainer {
+    display: flex;
+    align-items: center;
+  }
+
+.logoText {
+    margin-left: 10px;
+    font-size: 1.5rem;
+    color: #333;
+    font-family: "Trebuchet MS", Verdana, sans-serif;
+    font-weight: bold;
+}
+
+
