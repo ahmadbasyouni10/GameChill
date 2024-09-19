@@ -1,6 +1,9 @@
 # GameChill
 Game Chill is a full-stack web application developed with TypeScript, Next.js, Express, Docker, FFmpeg, Firebase Auth, and Google Cloud services. It features a robust back-end video processing system utilizing Cloud Pub/Sub and Cloud Run for asynchronous video transcoding. Integrated with Firebase Auth and Cloud Storage, Game Chill ensures secure authentication and seamless video uploading for users
 
+![image](https://github.com/user-attachments/assets/5861549e-98ea-4ea3-9215-cea7b368ca4a)
+
+
 ## Setup Instructions
 
 1. Clone the repository:
